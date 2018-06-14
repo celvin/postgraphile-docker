@@ -17,7 +17,7 @@ services:
           - /var/run/docker.sock:/var/run/docker.sock
           - ./logs:/logs
         labels:
-          - traefik.frontend.rule=Host:localdev.zlivio.com
+          - traefik.frontend.rule=Host:traefik.localhost
           - traefik.port=9091
           - traefik.enable=true
         ports:
@@ -54,6 +54,7 @@ services:
         restart: unless-stopped
         networks:
             - nexxtelnetwork
+            - traefik
         hostname: postgraphile-nexxtel
         container_name: postgraphile-nexxtel
 #        ports:
@@ -71,7 +72,7 @@ services:
             GRAPHILE_LISTEN_PORT: 5000
             WAIT_HOSTS: ${PGHOST}
         labels:
-            - "traefik.frontend.rule=Host:pgpgraph-local.zlivio.com"
+            - "traefik.frontend.rule=Host:graphql.localhost"
             - "traefik.port=5000"
             - "traefik.enable=true"
             - "traefik.backend=postgraphile-nexxtel"

@@ -10,6 +10,6 @@ address = ":9091"
 # Enable Docker configuration backend
 [docker]
 endpoint = "unix:///var/run/docker.sock"
-domain = "devlocal.zlivio.com"
+domain = "localhost"
 watch = true
 exposedbydefault = false
