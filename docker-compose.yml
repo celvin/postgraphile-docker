@@ -14,8 +14,6 @@ services:
         hostname: traefik
         volumes:
           - ./traefik.toml:/traefik.toml
-          - ./acme.json:/acme.json
-          - ./certs:/etc/traefik/certs
           - /var/run/docker.sock:/var/run/docker.sock
           - ./logs:/logs
         labels:
