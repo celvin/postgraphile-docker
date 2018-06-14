@@ -62,18 +62,24 @@ services:
             DEBUG: "true"
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            PGHOST: ${PGHOST}
-            DB_PORT: ${DB_PORT}
-            POSTGRES_DB: ${POSTGRES_DB}
-            PG_SCHEMA: "public"
+            POSTGRES_HOST: ${PGHOST}
+            POSTGRES_PORT: ${DB_PORT}
+            POSTGRES_DATABASE: ${POSTGRES_DB}
+            POSTGRES_SCHEMA: "public"
+            GRAPHILE_EXTRAS: "-o -a -j -M --append-plugins /plugins/connection-filter/index.js"
+            GRAPHILE_LISTEN: "0.0.0.0"
+            GRAPHILE_LISTEN_PORT: 5000
             WAIT_HOSTS: ${PGHOST}
         labels:
             - "traefik.frontend.rule=Host:pgpgraph-local.zlivio.com"
-            - "traefik.port=80"
+            - "traefik.port=5000"
             - "traefik.enable=true"
             - "traefik.backend=postgraphile-nexxtel"
             - "traefik.docker.network=traefik"
+        volumes:
+            - ./build/entrypoint.sh:/entrypoint.sh
         tty: true
+        entrypoint: ['/entrypoint.sh']
         depends_on:
             - ${PGHOST}
 

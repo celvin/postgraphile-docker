@@ -4,10 +4,6 @@ RUN apk add --update \
     bash \
     yarn
 
-## Add your application to the docker image
-ADD entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-
 RUN npm install -g yarn
 RUN yarn add global lerna \
                    pg@latest \
@@ -27,13 +23,10 @@ RUN apk add --update bash && \
 RUN yarn add global postgraphile
 ENV PATH="/node_modules/.bin/:${PATH}"
 
-## Add the wait script to thdocke image
+## Add the "waiting" script for docker's containers
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
 RUN chmod +x /wait
 
-## Launch the wait tool and then your application
-ENTRYPOINT ["/entrypoint.sh"]
-
 CMD ["/bin/bash"]
 
-EXPOSE 5000
+EXPOSE 80 5000
