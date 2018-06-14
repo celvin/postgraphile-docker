@@ -1,0 +1,87 @@
+version: '3'
+
+services:
+
+    proxy:
+        image: traefik
+        command: --docker --docker.watch --logLevel=DEBUG
+        restart: unless-stopped
+        networks:
+          - traefik
+        container_name: traefik
+        environment:
+          TERM: xterm
+        hostname: traefik
+        volumes:
+          - ./traefik.toml:/traefik.toml
+          - ./acme.json:/acme.json
+          - ./certs:/etc/traefik/certs
+          - /var/run/docker.sock:/var/run/docker.sock
+          - ./logs:/logs
+        labels:
+          - traefik.frontend.rule=Host:localdev.zlivio.com
+          - traefik.port=9091
+          - traefik.enable=true
+        ports:
+          - 80:80
+          - 443:443
+          - 9091:8080
+
+    pg-nexxtel:
+        image: postgres:10.0-alpine
+        restart: unless-stopped
+        networks:
+            - nexxtelnetwork
+        hostname: ${PGHOST}
+        container_name: ${PGHOST}
+        ports:
+            - "5432:5432"
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        environment:
+            POSTGRES_PORT: ${DB_PORT}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        volumes:
+            - ./postgres/data/:/var/lib/postgresql/data/
+
+    postgraphile-nexxtel:
+        image: graphqlserver-nexxtel
+        build:
+            context: ./build/
+        restart: unless-stopped
+        networks:
+            - nexxtelnetwork
+        hostname: postgraphile-nexxtel
+        container_name: postgraphile-nexxtel
+#        ports:
+#            - "5000:5000"
+        environment:
+            DEBUG: "true"
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            PGHOST: ${PGHOST}
+            DB_PORT: ${DB_PORT}
+            POSTGRES_DB: ${POSTGRES_DB}
+            PG_SCHEMA: "public"
+            WAIT_HOSTS: ${PGHOST}
+        labels:
+            - "traefik.frontend.rule=Host:pgpgraph-local.zlivio.com"
+            - "traefik.port=80"
+            - "traefik.enable=true"
+            - "traefik.backend=postgraphile-nexxtel"
+            - "traefik.docker.network=traefik"
+        tty: true
+        depends_on:
+            - ${PGHOST}
+
+networks:
+  nexxtelnetwork:
+    driver: bridge
+  traefik:
+    external:
+      name: traefik

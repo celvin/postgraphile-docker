@@ -1,0 +1,23 @@
+defaultEntryPoints = ["http", "https"]
+
+[web]
+address = ":9091"
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+#    [entryPoints.http.redirect]
+#      entryPoint = "https"
+#  [entryPoints.https]
+#  address = ":443"
+#    [entryPoints.https.tls]
+#    [[entryPoints.https.tls.certificates]]
+#      certFile = "/etc/traefik/certs/cert.pem"
+#      keyFile = "/etc/traefik/certs/zlivio1.key"
+
+# Enable Docker configuration backend
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "devlocal.zlivio.com"
+watch = true
+exposedbydefault = false
